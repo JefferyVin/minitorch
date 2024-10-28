@@ -7,7 +7,7 @@ from typing_extensions import Protocol
 
 from . import operators
 from .tensor_data import (
-    MAX_DIMS,
+    # MAX_DIMS,
     broadcast_index,
     index_to_position,
     shape_broadcast,
@@ -20,8 +20,7 @@ if TYPE_CHECKING:
 
 
 class MapProto(Protocol):
-    def __call__(self, x: Tensor, out: Optional[Tensor] = ..., /) -> Tensor:
-        ...
+    def __call__(self, x: Tensor, out: Optional[Tensor] = ..., /) -> Tensor: ...
 
 
 class TensorOps:
@@ -222,7 +221,12 @@ class SimpleOps(TensorOps):
 
     @staticmethod
     def matrix_multiply(a: "Tensor", b: "Tensor") -> "Tensor":
-        raise NotImplementedError("Not implemented in this assignment")
+        # apply bradcasted zip and then a reduce
+        # I think this is how it should be implemented?
+        # test is called test_mmm()
+        new_shape = list(a.shape[:-1]) + [b.shape[-1]]
+        c = a.contiguous().view(*a.shape, 1) * b
+        return c.sum(-2).view(*new_shape)
 
     is_cuda = False
 
@@ -264,8 +268,16 @@ def tensor_map(
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        out_index: Index = np.zeros_like(out_shape)
+        in_index: Index = np.zeros_like(in_shape)
+        # flag = list(out_shape) != list(in_shape)
+        for i in range(len(out)):
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, in_shape, in_index)
+            in_pos = index_to_position(in_index, in_strides)
+            out_pos = index_to_position(out_index, out_strides)
+            # print(fn(in_storage[in_pos]))
+            out[out_pos] = fn(in_storage[in_pos])
 
     return _map
 
@@ -309,8 +321,17 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        out_index: Index = np.zeros_like(out_shape)
+        a_index: Index = np.zeros_like(a_shape)
+        b_index: Index = np.zeros_like(b_shape)
+        for i in range(len(out)):
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, a_shape, a_index)
+            broadcast_index(out_index, out_shape, b_shape, b_index)
+            a_pos = index_to_position(a_index, a_strides)
+            b_pos = index_to_position(b_index, b_strides)
+            out_pos = index_to_position(out_index, out_strides)
+            out[out_pos] = fn(a_storage[a_pos], b_storage[b_pos])
 
     return _zip
 
@@ -340,8 +361,19 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        out_index: Index = np.zeros_like(out_shape)
+        a_index: Index = np.zeros_like(a_shape)
+        for i in range(len(out)):
+            to_index(i, out_shape, out_index)
+            out_pos = index_to_position(out_index, out_strides)
+            a_pos = index_to_position(out_index, a_strides)
+            out[out_pos] = a_storage[a_pos]
+            for j in range(1, a_shape[reduce_dim]):
+                a_index = out_index
+                a_index[reduce_dim] = j
+                out[out_pos] = fn(
+                    out[out_pos], a_storage[index_to_position(a_index, a_strides)]
+                )
 
     return _reduce
 

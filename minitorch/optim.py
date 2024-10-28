@@ -16,6 +16,7 @@ class SGD(Optimizer):
 
     def zero_grad(self) -> None:
         for p in self.parameters:
+            # print(p)
             if p.value is None:
                 continue
             if hasattr(p.value, "derivative"):
@@ -27,6 +28,7 @@ class SGD(Optimizer):
 
     def step(self) -> None:
         for p in self.parameters:
+            # print(p)
             if p.value is None:
                 continue
             if hasattr(p.value, "derivative"):

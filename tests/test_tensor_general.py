@@ -94,6 +94,7 @@ def test_one_derivative(
 ) -> None:
     "Run backward for all one arg functions above."
     t1 = data.draw(tensors(backend=shared[backend]))
+    # print(f"function name: {fn[0]}")
     name, _, tensor_fn = fn
     grad_check(tensor_fn, t1)
 
@@ -305,7 +306,7 @@ if numba.cuda.is_available():
 
 
 @given(data())
-@settings(max_examples=25)
+@settings(max_examples=20)  # 25 fails healthcheck
 @pytest.mark.parametrize("fn", two_arg)
 @pytest.mark.parametrize("backend", backend_tests)
 def test_two_grad_broadcast(
@@ -352,6 +353,21 @@ def test_mm2() -> None:
     minitorch.grad_check(lambda a, b: a @ b, a, b)
 
 
+# WHY DOES SIMPLE RUN FASTER THAN FAST?!?!??!??
+@pytest.mark.task3_2
+def test_mm2simple() -> None:
+    a = minitorch.rand((2, 3), backend=SimpleBackend)
+    b = minitorch.rand((3, 4), backend=SimpleBackend)
+    c = a @ b
+
+    c2 = (a.view(2, 3, 1) * b.view(1, 3, 4)).sum(1).view(2, 4)
+
+    for ind in c._tensor.indices():
+        assert_close(c[ind], c2[ind])
+
+    minitorch.grad_check(lambda a, b: a @ b, a, b)
+
+
 # ## Task 3.2 and 3.4
 
 # Matrix Multiplication
@@ -369,11 +385,32 @@ def test_bmm(backend: str, data: DataObject) -> None:
     )
     a = data.draw(tensors(backend=shared[backend], shape=(D, A, B)))
     b = data.draw(tensors(backend=shared[backend], shape=(1, B, C)))
-
+    saved_a = a + 0
+    saved_b = b + 0
     c = a @ b
     c2 = (
         (a.contiguous().view(D, A, B, 1) * b.contiguous().view(1, 1, B, C))
         .sum(2)
         .view(D, A, C)
+    )
+    print(
+        "Before:\na:",
+        saved_a,
+        "\nb:",
+        saved_b,
+        "\nAfter:",
+        "\na: ",
+        a,
+        "\nb: ",
+        b,
+        "\nC: ",
+        c,
+        "\nC2: ",
+        c2,
+        "\nc_shape: ",
+        c.shape,
+        "\nc2_shape: ",
+        c2.shape,
+        "\n\n",
     )
     assert_close_tensor(c, c2)

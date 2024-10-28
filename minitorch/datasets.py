@@ -21,6 +21,9 @@ class Graph:
 
 
 def simple(N: int) -> Graph:
+    """
+    I am able to converge with 30 points 2 hidden layers, opt to using slightly high LR of .5, converged around 130 epochs
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -30,6 +33,9 @@ def simple(N: int) -> Graph:
 
 
 def diag(N: int) -> Graph:
+    """
+    Same hyperparameters as above, converged around 100 epochs
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -39,6 +45,14 @@ def diag(N: int) -> Graph:
 
 
 def split(N: int) -> Graph:
+    """
+    I wasn't able to converge consistently with the previous hyperparameters (My fist try converged somehow), gradient boomed
+    After added another hidden layer (3) I've noticed the model converging easier
+    I do notice the 0.5 learning rate couldnt escape the local minima tho but I do believe It's already a high learning rate so I did not change it
+    I bet the ReLU is causing the gradient booms
+
+    I've increased the model hidden layer to 10 and it's converging very consistently (my theory is the poorly initialized parameters is disregarded as the well initialized parameters carries, its just pure RNG anyways), no longer stuck in local minima as easily anymore, however gradient booming still exists
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -48,6 +62,11 @@ def split(N: int) -> Graph:
 
 
 def xor(N: int) -> Graph:
+    """
+    For xor I felt 30 sample points are not enough to represent the function therefore I increased the sample points to 60 (I tested 30 sample points and indeed it works suboptimally)
+    60 works
+    (tried lowering hidden size, it did not go well)
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -57,6 +76,10 @@ def xor(N: int) -> Graph:
 
 
 def circle(N: int) -> Graph:
+    """
+    60 sample points work but larger sample is better
+    increasing hidden to 20 makes the circle more smooth but i'm worried about overfitting
+    """
     X = make_pts(N)
     y = []
     for x_1, x_2 in X:
@@ -67,6 +90,15 @@ def circle(N: int) -> Graph:
 
 
 def spiral(N: int) -> Graph:
+    """
+    Well, 10 hidden layers seems to do a bad job, so I bumped it to 100, also lowered learning rate as well as increased epoch to 0.05 and 150000 (eventually converged pretty well) however I'm disappointed cause I believe this function could be represented easier
+    Conclusion:
+    Failing to converge - increase hidden size :)
+    nan loss - lower learning rate
+    If you are worried about the low sample rate causes overfitting/bad representation, then increase the sample size
+    Yep thats about it I dont think its worth over thinking about shitty MLP layers, they do work but they cant under stand easy things
+    """
+
     def x(t: float) -> float:
         return t * math.cos(t) / 20.0
 

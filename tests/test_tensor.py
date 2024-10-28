@@ -179,7 +179,9 @@ def test_fromnumpy() -> None:
     print(t)
     assert t.shape == (2, 3)
     n = t.to_numpy()
+    print(n)
     t2 = tensor(n.tolist())
+    print(t2)
     for ind in t._tensor.indices():
         assert t[ind] == t2[ind]
 

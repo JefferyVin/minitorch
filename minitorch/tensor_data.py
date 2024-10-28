@@ -42,9 +42,13 @@ def index_to_position(index: Index, strides: Strides) -> int:
     Returns:
         Position in storage
     """
+    temp = 0
+    # print(index, strides)
+    for i, s in zip(index, strides):
+        temp += i * s
 
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    # print(f"temp: {temp}")
+    return temp
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -60,8 +64,24 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    """16 pos in shape[3, 3, 2] would transform to [2, 2, 0]"""
+    # print(f"shape: {shape}")
+    # print(f"stride_from_shape: {strides_from_shape(shape)}")
+    # if shape.size > 1:
+    #     raise Exception("meow")
+    # for i, s in enumerate(strides_from_shape(shape)):
+    #     out_index[i] = ordinal // s
+    #     print(f"outindex {i} shape {s}: {ordinal // s}")
+    #     ordinal -= out_index[i] * s
+    # print(f"ordinal: {ordinal}")
+    # print(out_index)
+    """"16 pos in shape[3, 3, 2] would transfrom to [2, 2, 0]"""
+    """wow Rush's right about all the weird bugs parallel causes"""
+    temp_ordinal = ordinal + 0
+    for i in range(len(shape) - 1, -1, -1):
+        sh = shape[i]
+        out_index[i] = temp_ordinal % sh
+        temp_ordinal = temp_ordinal // sh
 
 
 def broadcast_index(
@@ -83,8 +103,15 @@ def broadcast_index(
     Returns:
         None
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    # out_index: Index = np.zeros_like(shape) why is this line causing tests to fail? OH wait im a dumb ass
+    # [3, 4, 5] shaped big matrix
+    # [1, 5] shaped small matrix [1, 1, 5]
+    # out_index: [0, 5] [0, 0, 5]
+    for i, s in enumerate(shape):
+        if s > 1:
+            out_index[i] = big_index[i + len(big_shape) - len(shape)]
+        else:
+            out_index[i] = 0
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -101,11 +128,30 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     Raises:
         IndexingError : if cannot broadcast
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    new_shape = list()
+    shape1_new = shape1
+    shape2_new = shape2
+    if len(shape1) < len(shape2):
+        shape1_new = (1,) * (len(shape2) - len(shape1)) + shape1
+    if len(shape2) < len(shape1):
+        shape2_new = (1,) * (len(shape1) - len(shape2)) + shape2
+    for i, (s1, s2) in enumerate(zip(shape1_new, shape2_new)):
+        if s1 != s2 and s1 != 1 and s2 != 1:
+            raise IndexingError("cannot broadcast")
+        new_shape.append(max(s1, s2))
+    return tuple(new_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
+    """
+    [3, 3, 2] shape would transform into [1, 2, 6, 18] -> [6, 2, 1]
+
+    Args:
+        shape (UserShape): _description_
+
+    Returns:
+        UserStrides: _description_
+    """
     layout = [1]
     offset = 1
     for s in reversed(shape):
@@ -227,8 +273,13 @@ class TensorData:
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
-        # TODO: Implement for Task 2.1.
-        raise NotImplementedError('Need to implement for Task 2.1')
+        new_shape = tuple(self.shape[i] for i in order)
+        new_strides = tuple(self.strides[i] for i in order)
+        # print(f"permu: {order}")
+        # print(self.shape, new_shape)
+        # print(self.strides, new_strides)
+
+        return TensorData(self._storage, new_shape, new_strides)
 
     def to_string(self) -> str:
         s = ""

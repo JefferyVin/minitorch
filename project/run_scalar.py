@@ -2,6 +2,7 @@
 Be sure you have minitorch installed in you Virtual Env.
 >>> pip install -Ue .
 """
+
 import random
 
 import minitorch
@@ -109,8 +110,44 @@ class ScalarTrain:
 
 
 if __name__ == "__main__":
-    PTS = 50
+    PTS = 30
     HIDDEN = 2
     RATE = 0.5
     data = minitorch.datasets["Simple"](PTS)
     ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 30
+    # HIDDEN = 2
+    # RATE = 0.5
+    # data = minitorch.datasets["Diag"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 30
+    # HIDDEN = 10
+    # RATE = 0.5
+    # data = minitorch.datasets["Split"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 60
+    # HIDDEN = 10
+    # RATE = 0.5
+    # data = minitorch.datasets["Xor"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 30
+    # HIDDEN = 10
+    # RATE = 0.5
+    # data = minitorch.datasets["Split"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 60
+    # HIDDEN = 20
+    # RATE = 0.5
+    # data = minitorch.datasets["Circle"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 60
+    # HIDDEN = 100
+    # RATE = 0.5
+    # data = minitorch.datasets["Spiral"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)

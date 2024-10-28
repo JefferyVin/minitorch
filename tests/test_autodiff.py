@@ -80,8 +80,8 @@ def test_chain_rule3() -> None:
 
 @pytest.mark.task1_3
 def test_chain_rule4() -> None:
-    var1 = minitorch.Scalar(5)
-    var2 = minitorch.Scalar(10)
+    var1 = minitorch.Scalar(5, name="var1")
+    var2 = minitorch.Scalar(10, name="var2")
 
     y = Function2.apply(var1, var2)
 
@@ -89,10 +89,10 @@ def test_chain_rule4() -> None:
     back = list(back)
     assert len(back) == 2
     variable, deriv = back[0]
-    # assert variable.name == var1.name
+    assert variable.name == var1.name
     assert deriv == 5 * (10 + 1)
     variable, deriv = back[1]
-    # assert variable.name == var2.name
+    assert variable.name == var2.name
     assert deriv == 5 * 5
 
 

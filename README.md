@@ -1,12 +1,8 @@
 # minitorch
-The full minitorch student suite. 
 
-
-To access the autograder: 
-
-* Module 0: https://classroom.github.com/a/qDYKZff9
-* Module 1: https://classroom.github.com/a/6TiImUiy
-* Module 2: https://classroom.github.com/a/0ZHJeTA0
-* Module 3: https://classroom.github.com/a/U5CMJec1
-* Module 4: https://classroom.github.com/a/04QA6HZK
-* Quizzes: https://classroom.github.com/a/bGcGc12k
+My solution to minitorch with some tweaks to the original file
+Day 1 module 0
+Day 2 module 1
+Day 3 module 2
+Day 4 module 3 (Task 3.1 and 3.2)
+Day 5 module 3 (Task 3.3, 3.4, 3.5)
