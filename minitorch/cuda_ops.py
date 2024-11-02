@@ -300,7 +300,7 @@ def tensor_reduce(
         reduce_value: float,
     ) -> None:
         """
-        Bruh I've procinated so much on this assignment. all it took is a little sketch on my ipad and verything just got sovled
+        Bruh I've procinated so much on this. all it took is a little sketch on my ipad and verything just got sovled
         """
         BLOCK_DIM = 1024
         cache = cuda.shared.array(BLOCK_DIM, numba.float64)
